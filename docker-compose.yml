@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    image: archi-analyser
+    ports:
+      - "3000:3000"
+    # Optional: without a .env file the app runs in mock mode (canned reviews).
+    # With JARVIS_BASE_URL, JARVIS_API_KEY and JARVIS_MODEL set, it calls the real model.
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped

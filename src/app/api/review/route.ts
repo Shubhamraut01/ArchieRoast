@@ -1,6 +1,8 @@
 import { rateLimit } from "@/lib/rate-limit";
 import { analyse, extract, redesign, roast } from "@/lib/review/stages";
 import { validateAnalysis, validateInventory } from "@/lib/review/validate";
+import { isTemporalEnabled } from "@/temporal/config";
+import type { Analysis, Inventory } from "@/lib/review/types";
 
 // Vision/reasoning models on cold GPUs can be slow; each stage is its own request.
 export const maxDuration = 60;
@@ -16,6 +18,35 @@ function hasImageMagicBytes(base64: string): boolean {
   const png = head.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
   const jpeg = head.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]));
   return png || jpeg;
+}
+
+type Run = {
+  stage: "extract" | "analyse" | "roast" | "redesign";
+  image?: string;
+  inventory?: Inventory;
+  analysis?: Analysis;
+};
+
+/**
+ * Runs one stage. With TEMPORAL_ENABLED=true it executes as a durable workflow
+ * (retries, history, crash survival); otherwise it runs inline as before.
+ */
+async function execute(run: Run) {
+  if (isTemporalEnabled()) {
+    // Lazy import keeps the Temporal SDK out of the default code path.
+    const { runStageViaTemporal } = await import("@/temporal/run");
+    return runStageViaTemporal(run);
+  }
+  switch (run.stage) {
+    case "extract":
+      return extract(run.image as string);
+    case "analyse":
+      return analyse(run.inventory as Inventory);
+    case "roast":
+      return roast(run.inventory as Inventory, run.analysis as Analysis);
+    case "redesign":
+      return redesign(run.inventory as Inventory, run.analysis as Analysis);
+  }
 }
 
 const bad = (error: string, status = 400) =>
@@ -49,12 +80,19 @@ export async function POST(request: Request) {
         if ((match[2].length * 3) / 4 > MAX_IMAGE_BYTES) {
           return bad("Image is over 4MB.", 413);
         }
-        return Response.json(await extract(body.image as string));
+        return Response.json(
+          await execute({ stage: "extract", image: body.image as string }),
+        );
       }
       case "analyse": {
         if (JSON.stringify(body).length > MAX_JSON_BYTES)
           return bad("Payload is too large.", 413);
-        return Response.json(await analyse(validateInventory(body.inventory)));
+        return Response.json(
+          await execute({
+            stage: "analyse",
+            inventory: validateInventory(body.inventory),
+          }),
+        );
       }
       case "roast":
       case "redesign": {
@@ -63,9 +101,7 @@ export async function POST(request: Request) {
         const inventory = validateInventory(body.inventory);
         const analysis = validateAnalysis(body.analysis);
         return Response.json(
-          body.stage === "roast"
-            ? await roast(inventory, analysis)
-            : await redesign(inventory, analysis),
+          await execute({ stage: body.stage, inventory, analysis }),
         );
       }
       default:

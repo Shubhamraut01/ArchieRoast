@@ -26,6 +26,11 @@ const STACK = [
       "A vision-and-reasoning model on JarvisLabs GPUs, called through its OpenAI-compatible endpoint with the OpenAI SDK. Four steps: extract, analyse, roast, redesign.",
   },
   {
+    label: "Orchestration",
+    value:
+      "Temporal runs each review step as a durable workflow with automatic retries and a replayable history.",
+  },
+  {
     label: "Diagrams",
     value:
       "Mermaid (open source) draws the improved architecture in the browser.",

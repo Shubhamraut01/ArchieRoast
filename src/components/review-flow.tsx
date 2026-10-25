@@ -11,6 +11,7 @@ import { InventoryView } from "@/components/review/inventory";
 import { RedesignView } from "@/components/review/redesign-view";
 import { Scorecard, spaghettiScore } from "@/components/review/scorecard";
 import { UsageFooter } from "@/components/review/usage-footer";
+import { TemporalProof } from "@/components/temporal-proof";
 import { Typewriter } from "@/components/typewriter";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +39,7 @@ import type {
   Usage,
 } from "@/lib/review/types";
 import { SAMPLE_IMAGE_DATA_URL } from "@/lib/sample-image";
+import type { TemporalInfo } from "@/temporal/types";
 import { isSampleFile } from "@/lib/sample";
 
 type MainStage = Exclude<Stage, "redesign">;
@@ -100,9 +102,12 @@ async function sampleStage(stage: Stage): Promise<StageResponse<never>> {
   return { data: SAMPLE_DATA[stage] as never, usage: null };
 }
 
+/** Stage response; `temporal` is present only when TEMPORAL_ENABLED on the server. */
+type ApiStageResponse<T> = StageResponse<T> & { temporal?: TemporalInfo };
+
 async function apiStage<T>(
   payload: Record<string, unknown>,
-): Promise<StageResponse<T>> {
+): Promise<ApiStageResponse<T>> {
   const res = await fetch("/api/review", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -110,7 +115,7 @@ async function apiStage<T>(
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
-  return body as StageResponse<T>;
+  return body as ApiStageResponse<T>;
 }
 
 function toMarkdown(inv: Inventory, a: Analysis, r: RoastText): string {
@@ -147,6 +152,7 @@ export function ReviewFlow() {
   const [roast, setRoast] = useState<RoastText | null>(null);
   const [redesign, setRedesign] = useState<RedesignState>({ status: "idle" });
   const [usages, setUsages] = useState<Usage[]>([]);
+  const [temporal, setTemporal] = useState<TemporalInfo[]>([]);
   const [typed, setTyped] = useState(false);
   const [copied, setCopied] = useState(false);
   const [beforeSrc, setBeforeSrc] = useState<string | null>(null);
@@ -169,8 +175,10 @@ export function ReviewFlow() {
     };
   }, [beforeSrc]);
 
-  function addUsage(u: Usage | null) {
-    if (u) setUsages((prev) => [...prev, u]);
+  function addResult(r: ApiStageResponse<unknown>) {
+    if (r.usage) setUsages((prev) => [...prev, r.usage as Usage]);
+    if (r.temporal)
+      setTemporal((prev) => [...prev, r.temporal as TemporalInfo]);
   }
 
   function resetResults() {
@@ -180,6 +188,7 @@ export function ReviewFlow() {
     setRoast(null);
     setRedesign({ status: "idle" });
     setUsages([]);
+    setTemporal([]);
     setTyped(false);
     setCopied(false);
   }
@@ -198,7 +207,7 @@ export function ReviewFlow() {
     const sample = isSampleFile(file);
     const call = <T,>(stage: Stage, payload: Record<string, unknown>) =>
       sample
-        ? (sampleStage(stage) as Promise<StageResponse<T>>)
+        ? (sampleStage(stage) as Promise<ApiStageResponse<T>>)
         : apiStage<T>({ stage, ...payload });
 
     let stage: MainStage = from;
@@ -213,7 +222,7 @@ export function ReviewFlow() {
         const r = await call<Inventory>("extract", { image });
         inv = r.data;
         setInventory(inv);
-        addUsage(r.usage);
+        addResult(r);
         if (!inv.isArchitecture) {
           setPhase({ kind: "done" });
           return;
@@ -225,7 +234,7 @@ export function ReviewFlow() {
         const r = await call<Analysis>("analyse", { inventory: inv });
         an = r.data;
         setAnalysis(an);
-        addUsage(r.usage);
+        addResult(r);
       }
       stage = "roast";
       setPhase({ kind: "running", stage });
@@ -234,7 +243,7 @@ export function ReviewFlow() {
         analysis: an,
       });
       setRoast(r.data);
-      addUsage(r.usage);
+      addResult(r);
       setPhase({ kind: "done" });
     } catch (err) {
       setPhase({
@@ -263,9 +272,9 @@ export function ReviewFlow() {
     try {
       const sample = isSampleFile(fileRef.current);
       const r = sample
-        ? ((await sampleStage("redesign")) as StageResponse<Redesign>)
+        ? ((await sampleStage("redesign")) as ApiStageResponse<Redesign>)
         : await apiStage<Redesign>({ stage: "redesign", inventory, analysis });
-      addUsage(r.usage);
+      addResult(r);
       setRedesign({ status: "done", data: r.data });
     } catch (err) {
       setRedesign({
@@ -349,6 +358,7 @@ export function ReviewFlow() {
                 <p className="mt-1 text-sm">{roast.advice}</p>
               </div>
             )}
+            {typed && temporal.length > 0 && <TemporalProof runs={temporal} />}
           </section>
         )}
 

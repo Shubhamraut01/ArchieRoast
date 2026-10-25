@@ -1,0 +1,22 @@
+# Never copy secrets or local state into the image.
+.env*
+!.env.example
+
+node_modules
+.next
+.git
+.gitignore
+.claude
+.vscode
+.idea
+
+# Not needed to build or run the app.
+Dockerfile
+docker-compose.yml
+.dockerignore
+README.md
+RUNNING.md
+AGENTS.md
+diagrams
+sponserlogos
+*.log

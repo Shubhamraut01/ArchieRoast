@@ -1,20 +1,74 @@
-# ArchieRoast
-Project Description (The Elevator Pitch)
-ArchRoast (or Gordon RAM-say) is an AI-powered web tool that brings brutal honesty to software engineering. Users upload a screenshot or diagram of their system architecture, and our elite AI architect ruthlessly roasts their design choices—calling out single points of failure, over-engineered microservices, and outdated tech stacks. Beneath the humor, it delivers one piece of genuinely actionable advice to improve the system. It’s a tool built for developers to laugh, cry, and learn
+# Archi Analyser
 
+**Upload an architecture diagram and get a funny, technically accurate review, with fixes, a carbon grade and an improved diagram, powered by Gemma 4.**
 
-To finish in 2 hours, you must be ruthless with your scope. Do not build a database. Your app is a stateless pipeline: Image goes in, Roast comes out.
+Archi Analyser (a.k.a. ArchieRoast, or Gordon RAM-say) is a free architecture review for small teams that can't afford one. Drop in a screenshot of your system. A multimodal open model reads it and tells you, with brutal honesty and real substance, what is wrong and what to do about it.
 
-1. The "Dropzone" UI (Frontend)
+## What you get
 
-A clean, centered drag-and-drop box for image uploads (PNG/JPG).
-Hackathon cheat: Use a pre-built component library like shadcn/ui or a Tailwind template to make it look premium in 5 minutes.
-2. The Vision API Integration (Backend)
+A review runs in four steps, and each result appears as soon as it is ready:
 
-A single API route (e.g., Next.js API route or Express endpoint).
-Takes the base64-encoded image and sends it to a multimodal LLM (like OpenAI's gpt-4o).
-Returns a JSON payload with the roast text.
-3. The Typewriter Reveal (Frontend Polish)
+1. **Extract:** a list of the components and connections the model actually sees, so you can spot misreads.
+2. **Analyse:** a scorecard (reliability, security, scalability, cost, observability, sustainability), plus a sortable table of **proposed changes** with effort, impact and a "do these 3 first" shortlist.
+3. **Roast:** a specific, funny roast grounded in the analysis, plus one piece of genuinely useful advice.
+4. **Redesign:** a before/after **improved architecture**, drawn with Mermaid in your browser. Copy the code or download an SVG.
 
-When the API returns the roast, don't just dump the text on the screen. Reveal it character-by-character (like a terminal or ChatGPT typing) to make it feel "smart" and dramatic.
-Add a visual loading state (e.g., "Analyzing microservices...", "Finding circular dependencies...") while waiting for the API to respond.
+It also gives the design a **carbon grade (A to E)** with its main drivers, and shows the **real token usage** of your review with a ranged energy estimate. The energy figure is clearly labelled an estimate, because no one publishes it for these models.
+
+You can also paste a screenshot, and there is an offline **Try a sample** button that plays a canned review without any model call.
+
+## Powered by Gemma 4 and JarvisLabs
+
+Inference runs on open-weight models served by **[JarvisLabs](https://jarvislabs.ai)** through an OpenAI-compatible endpoint. The project was run end to end on **Gemma 4 31B** (`gemma-4-31b-it`), and it also works with other models JarvisLabs serves. Choosing the model is one environment variable:
+
+```bash
+JARVIS_MODEL=gemma-4-31b-it
+```
+
+The app is model-agnostic. With no JarvisLabs settings at all it falls back to canned data, so you can try the interface with no keys.
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env      # then fill in the three JARVIS_* values
+npm run dev
+```
+
+Open http://localhost:3000.
+
+| Variable | Meaning |
+|---|---|
+| `JARVIS_BASE_URL` | OpenAI-compatible base URL, e.g. `https://models.jarvislabs.net/v1` |
+| `JARVIS_API_KEY` | Your JarvisLabs API key (never commit it; `.env` is git-ignored) |
+| `JARVIS_MODEL` | Model to use, e.g. `gemma-4-31b-it` (must accept images) |
+
+See [RUNNING.md](RUNNING.md) for configuration details, the API, deployment and troubleshooting.
+
+## How it works
+
+Each step is a separate request to `POST /api/review`, so it stays under serverless time limits and results stream into the page as they arrive. Later steps work from structured JSON facts and not the image, so the roast and the changes table cannot invent components. The model's output is validated and retried once if it returns malformed JSON.
+
+```
+image ─▶ extract ─▶ inventory ─▶ analyse ─▶ analysis ─▶ roast
+                                     └────────▶ redesign (on button click)
+```
+
+Images are processed once and never stored. There is no database.
+
+## Built with
+
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, the OpenAI SDK (pointed at JarvisLabs) and [Mermaid](https://mermaid.js.org) (open source).
+
+## More docs
+
+- [RUNNING.md](RUNNING.md): run, configure and deploy the app.
+- [TEMPORAL.md](TEMPORAL.md): optional Temporal integration that runs each review step as a durable workflow with automatic retries.
+
+## Sponsors
+
+Thanks to [JarvisLabs](https://jarvislabs.ai), Kepler and Temporal.
+
+## License
+
+[MIT](LICENSE)
