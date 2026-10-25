@@ -67,7 +67,26 @@ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, the O
 
 ## Sponsors
 
-Thanks to [JarvisLabs](https://jarvislabs.ai), Kepler and Temporal.
+Thanks to our sponsors for making this possible.
+
+<table>
+  <tr>
+    <td align="center" width="180">
+      <a href="https://jarvislabs.ai"><img src="sponserlogos/jarvislabs.jpg" alt="JarvisLabs" height="96"></a><br>
+      <b>JarvisLabs</b><br>
+      <sub>GPU inference for Gemma 4</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="sponserlogos/kepler.png" alt="Kepler" height="96"><br>
+      <b>Kepler</b>
+    </td>
+    <td align="center" width="180">
+      <img src="sponserlogos/temporalai.png" alt="Temporal" height="96"><br>
+      <b>Temporal</b><br>
+      <sub>Durable workflows</sub>
+    </td>
+  </tr>
+</table>
 
 ## License
 
