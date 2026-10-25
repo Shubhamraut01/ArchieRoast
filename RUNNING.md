@@ -23,7 +23,7 @@ Set these in `.env.local` (git-ignored). `.env.example` is the committed templat
 
 | Variable | What it is |
 |---|---|
-| `JARVIS_BASE_URL` | JarvisLabs endpoint: `https://serverlessn.jarvislabs.net/openai/<deployment_id>/v1` |
+| `JARVIS_BASE_URL` | OpenAI-compatible base URL, e.g. `https://models.jarvislabs.net/v1` (managed) or `https://serverlessn.jarvislabs.net/openai/<deployment_id>/v1` (your own deployment) |
 | `JARVIS_API_KEY` | Your JarvisLabs API key |
 | `JARVIS_MODEL` | Exact model name served by the deployment (must support images) |
 
@@ -35,9 +35,15 @@ three are set, requests go to your JarvisLabs deployment
 ([src/lib/roast/jarvis.ts](src/lib/roast/jarvis.ts)). Restart `npm run dev` after
 changing `.env.local`.
 
-> The JarvisLabs path is tested against a fake OpenAI-compatible server (request
-> shape, bearer auth, JSON parsing, retry, error handling). It has not been run
-> against a real JarvisLabs deployment yet, so check the first real roast.
+> Verified against a real JarvisLabs managed endpoint
+> (`https://models.jarvislabs.net/v1`, a reasoning vision model). Reasoning models
+> spend 1-2k hidden tokens before answering, so `max_tokens` is set to 6000 in
+> [src/lib/roast/jarvis.ts](src/lib/roast/jarvis.ts); lower values return empty replies.
+> A roast takes roughly 6-12 seconds.
+
+Put the values in `.env.local` **or** `.env` (both are git-ignored). If you use `.env`,
+don't leave blank `JARVIS_*` lines in `.env.local`: it takes precedence, and an empty
+value there silently disables the real model.
 
 ### Getting a JarvisLabs endpoint
 

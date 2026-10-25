@@ -23,7 +23,9 @@ export function createJarvisRoast(config: JarvisConfig): RoastProvider {
     const completion = await client.chat.completions.create({
       model: config.model,
       temperature: 0.8,
-      max_tokens: 900,
+      // Reasoning models spend 1-2k hidden tokens before answering; a small
+      // cap leaves `content` null.
+      max_tokens: 6000,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
@@ -35,7 +37,13 @@ export function createJarvisRoast(config: JarvisConfig): RoastProvider {
         },
       ],
     });
-    return completion.choices[0]?.message?.content ?? "";
+    const choice = completion.choices[0];
+    if (!choice?.message?.content) {
+      throw new Error(
+        `Model returned no content (finish_reason: ${choice?.finish_reason}).`,
+      );
+    }
+    return choice.message.content;
   }
 
   return async (imageDataUrl) => {
