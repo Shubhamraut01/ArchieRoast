@@ -33,6 +33,11 @@ Shows the happy path, quota rejection and model failure path. Failure returns a 
 
 The demo narrative: upload → rotating “analyzing” states → typed roast → one actionable fix → share.
 
+## Other architecture examples
+
+- [PulseBoard](./pulseboard/README.md) — product analytics with a Kafka ingest pipeline, ClickHouse and S3.
+- [Relay](./relay/README.md) — reliable webhook delivery with a transactional outbox, retries and a DLQ.
+
 ## Regenerate
 
-Paste the `code` value from `renders.json` into the Eraser editor for the matching diagram type. The committed PNGs use the dark theme so they drop straight into a slide deck.
+Paste the `code` value from the matching `architecture.json` or `renders.json` into the Eraser editor for that diagram type. The committed PNGs use the dark theme so they drop straight into a slide deck.
