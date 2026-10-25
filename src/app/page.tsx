@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { RoastCard } from "@/components/roast-card";
+import { ReviewFlow } from "@/components/review-flow";
 import { Sponsors } from "@/components/sponsors";
 import { TechStack } from "@/components/tech-stack";
 
@@ -25,7 +25,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-8 px-6 pb-16 text-center">
+      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-8 px-6 pb-16 text-center">
         <div className="space-y-4">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
             Your architecture diagram,{" "}
@@ -39,7 +39,7 @@ export default function Home() {
           </p>
         </div>
 
-        <RoastCard />
+        <ReviewFlow />
       </main>
 
       <footer className="text-muted-foreground relative z-10 pb-6 text-center text-xs">

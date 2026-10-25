@@ -23,12 +23,17 @@ const STACK = [
   {
     label: "AI",
     value:
-      "Vision model on JarvisLabs GPUs, called through its OpenAI-compatible endpoint with the OpenAI SDK.",
+      "A vision-and-reasoning model on JarvisLabs GPUs, called through its OpenAI-compatible endpoint with the OpenAI SDK. Four steps: extract, analyse, roast, redesign.",
+  },
+  {
+    label: "Diagrams",
+    value:
+      "Mermaid (open source) draws the improved architecture in the browser.",
   },
   {
     label: "UX",
     value:
-      "Streaming-style typewriter reveal, staged loading states, paste and drag-and-drop upload.",
+      "Results stream in as each step finishes, with a typewriter reveal, paste and drag-and-drop upload, and a token and energy footer.",
   },
 ] as const;
 
