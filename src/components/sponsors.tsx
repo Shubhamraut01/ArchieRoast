@@ -6,7 +6,7 @@ const SPONSORS = [
     logo: "/sponsors/jarvislabs.jpg",
     href: "https://jarvislabs.ai",
   },
-  { name: "Kepler", logo: "/sponsors/kepler.png" },
+  { name: "Kepler", logo: "/sponsors/kepler-rubixkube.png" },
   { name: "Temporal", logo: "/sponsors/temporal.png" },
 ] as const;
 
@@ -23,7 +23,7 @@ export function Sponsors() {
                 alt=""
                 width={20}
                 height={20}
-                className="size-5 rounded-sm object-cover"
+                className="size-5 rounded-[22%] object-cover"
               />
               <span>{s.name}</span>
             </>
