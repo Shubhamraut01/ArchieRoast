@@ -88,7 +88,7 @@ Notes: `/api/roast` has `maxDuration = 60`. There is no rate limiting yet; add o
 
 ## Sample data
 
-- `diagrams/` holds demo diagrams; `public/samples/sample-architecture.png` powers the "Try a sample" button.
+- `diagrams/` holds demo diagrams. The "Try a sample" button uses `diagrams/architecture.png`, embedded in `src/lib/sample-image.ts`, and plays a canned roast from `src/lib/sample.ts`: no AI call, no network, so it works offline. Regenerate the embed if you change the diagram.
 - `public/sponsors/` holds the footer logos.
 
 ## Troubleshooting

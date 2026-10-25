@@ -4,14 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Flame, ImageUp, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { createSampleFile } from "@/lib/sample";
 import { cn } from "@/lib/utils";
 
 // Anything the browser can decode; prepareImage converts it to PNG/JPEG.
 const MAX_BYTES = 10 * 1024 * 1024;
-const SAMPLE = {
-  url: "/samples/sample-architecture.png",
-  name: "sample-architecture.png",
-};
 
 type DropzoneProps = {
   onRoast: (file: File) => void;
@@ -86,13 +83,8 @@ export function Dropzone({
     onClear?.();
   };
 
-  async function loadSample() {
-    try {
-      const blob = await (await fetch(SAMPLE.url)).blob();
-      accept(new File([blob], SAMPLE.name, { type: blob.type }));
-    } catch {
-      setError("Couldn't load the sample diagram.");
-    }
+  function loadSample() {
+    accept(createSampleFile());
   }
 
   return (

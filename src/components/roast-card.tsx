@@ -17,12 +17,13 @@ import {
 } from "@/components/ui/card";
 import { prepareImage } from "@/lib/image";
 import type { RoastResult } from "@/lib/roast";
+import { isSampleFile, SAMPLE_ROAST } from "@/lib/sample";
 
 type State =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
-  | { status: "done"; result: RoastResult };
+  | { status: "done"; result: RoastResult; demo?: boolean };
 
 const SEVERITY_STYLE = {
   high: "border-red-500/50 text-red-400",
@@ -47,6 +48,14 @@ export function RoastCard() {
     setTyped(false);
     setCopied(false);
     setState({ status: "loading" });
+
+    // Demo path: canned roast, no network, works offline.
+    if (isSampleFile(file)) {
+      await new Promise((r) => setTimeout(r, 3500));
+      setState({ status: "done", result: SAMPLE_ROAST, demo: true });
+      return;
+    }
+
     try {
       const image = await prepareImage(file);
       const res = await fetch("/api/roast", {
@@ -111,6 +120,11 @@ export function RoastCard() {
             }
             className="space-y-4 border-t pt-4"
           >
+            {state.demo && (
+              <Badge variant="outline" className="font-mono">
+                demo roast · no AI call
+              </Badge>
+            )}
             {/* key remounts the typewriter for each new roast */}
             <Typewriter
               key={state.result.roast}
