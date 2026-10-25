@@ -1,3 +1,12 @@
+<p align="center">
+  <sub><b>SPONSORED BY</b></sub><br>
+  <a href="https://jarvislabs.ai"><img src="sponserlogos/jarvislabs.jpg" alt="JarvisLabs" height="40"></a>
+  &nbsp;&nbsp;&nbsp;
+  <img src="sponserlogos/kepler.png" alt="Kepler" height="40">
+  &nbsp;&nbsp;&nbsp;
+  <img src="sponserlogos/temporalai.png" alt="Temporal" height="40">
+</p>
+
 # Archi Analyser
 
 **Upload an architecture diagram and get a funny, technically accurate review, with fixes, a carbon grade and an improved diagram, powered by Gemma 4.**
