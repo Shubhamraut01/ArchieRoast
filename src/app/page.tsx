@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { RoastCard } from "@/components/roast-card";
 import { Sponsors } from "@/components/sponsors";
+import { TechStack } from "@/components/tech-stack";
 
 export default function Home() {
   return (
@@ -16,9 +17,12 @@ export default function Home() {
         <span className="font-mono text-sm font-semibold tracking-tight">
           archi<span className="text-orange-500">.</span>analyser
         </span>
-        <Badge variant="outline" className="font-mono">
-          beta
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="font-mono">
+            beta
+          </Badge>
+          <TechStack />
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-8 px-6 pb-16 text-center">
