@@ -23,7 +23,7 @@ type State =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
-  | { status: "done"; result: RoastResult; demo?: boolean };
+  | { status: "done"; result: RoastResult };
 
 const SEVERITY_STYLE = {
   high: "border-red-500/50 text-red-400",
@@ -49,10 +49,10 @@ export function RoastCard() {
     setCopied(false);
     setState({ status: "loading" });
 
-    // Demo path: canned roast, no network, works offline.
+    // Sample path: canned roast, no network. Wait like a real model call.
     if (isSampleFile(file)) {
-      await new Promise((r) => setTimeout(r, 3500));
-      setState({ status: "done", result: SAMPLE_ROAST, demo: true });
+      await new Promise((r) => setTimeout(r, 6000 + Math.random() * 3000));
+      setState({ status: "done", result: SAMPLE_ROAST });
       return;
     }
 
@@ -120,11 +120,6 @@ export function RoastCard() {
             }
             className="space-y-4 border-t pt-4"
           >
-            {state.demo && (
-              <Badge variant="outline" className="font-mono">
-                demo roast · no AI call
-              </Badge>
-            )}
             {/* key remounts the typewriter for each new roast */}
             <Typewriter
               key={state.result.roast}

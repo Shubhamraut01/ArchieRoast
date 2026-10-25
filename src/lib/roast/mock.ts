@@ -31,6 +31,6 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Stand-in provider so the UI can be built before the real model is wired. */
 export const mockRoast: RoastProvider = async () => {
-  await sleep(2500);
+  await sleep(5000 + Math.random() * 3000); // feel like a real model call
   return SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
 };
