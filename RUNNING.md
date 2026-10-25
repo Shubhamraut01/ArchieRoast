@@ -96,4 +96,5 @@ Notes: `/api/roast` has `maxDuration = 60`. There is no rate limiting yet; add o
 - **Port 3000 in use:** `npm run dev -- -p 3001`
 - **Env changes not picked up:** restart `npm run dev`; Next.js reads env at startup.
 - **415 from the API:** the image must be a real PNG or JPG (the file signature is checked, not just the extension).
-- **413 from the API:** image is over 4MB.
+- **413 from the API:** the uploaded payload is over 4MB (the browser normally downscales first).
+- **Image greyed out in the file picker:** the picker now accepts any image; WebP, AVIF and GIF are converted to JPEG in the browser. HEIC only works in Safari; export it as JPG elsewhere.

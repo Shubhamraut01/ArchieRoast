@@ -6,8 +6,8 @@ import { Flame, ImageUp, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const ACCEPTED_TYPES = ["image/png", "image/jpeg"];
-const MAX_BYTES = 4 * 1024 * 1024;
+// Anything the browser can decode; prepareImage converts it to PNG/JPEG.
+const MAX_BYTES = 10 * 1024 * 1024;
 const SAMPLE = {
   url: "/samples/sample-architecture.png",
   name: "sample-architecture.png",
@@ -20,11 +20,11 @@ type DropzoneProps = {
 };
 
 function validate(file: File): string | null {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
-    return "Only PNG or JPG images, please.";
+  if (!file.type.startsWith("image/")) {
+    return "That isn't an image. Try a PNG, JPG or WebP.";
   }
   if (file.size > MAX_BYTES) {
-    return `That file is ${(file.size / 1024 / 1024).toFixed(1)}MB. Max is 4MB.`;
+    return `That file is ${(file.size / 1024 / 1024).toFixed(1)}MB. Max is 10MB.`;
   }
   return null;
 }
@@ -100,7 +100,7 @@ export function Dropzone({
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPTED_TYPES.join(",")}
+        accept="image/*"
         className="sr-only"
         onChange={(e) => accept(e.target.files?.[0])}
       />
@@ -155,7 +155,8 @@ export function Dropzone({
               or drag and drop
             </span>
             <span className="text-xs">
-              PNG or JPG, up to 4MB. You can also paste a screenshot.
+              PNG, JPG, WebP and more, up to 10MB. You can also paste a
+              screenshot.
             </span>
           </button>
           <button
